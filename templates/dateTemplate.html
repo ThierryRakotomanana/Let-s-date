@@ -10,5 +10,40 @@
 <body>
     <h1>Date With Your futur Dareling</h1>
     <p>Let' have a date and Go to the hotel after (from template)</p>
+    <ul id="messages"></ul>
+    <form id="chatbox">
+        <textarea></textarea>
+        <input type="submit" value="Send" />
+    </from>
+    
+<script>
+$(function () {
+  var socket = null;
+  var msgBox = $("#chatbox textarea");
+  var messages = $("#messages");
+  $("#chatbox").submit(function () {
+    if (!msgBox.val()) return false;
+    if (!socket) {
+      alert("Error: There is no socket connection.");
+      return false;
+    }
+    socket.send(msgBox.val());
+    msgBox.val("");
+    return false;
+  });
+  if (!window["WebSocket"]) {
+    alert("Error: Your browser does not support web sockets.");
+  } else {
+    socket = new WebSocket("ws://localhost:8080/room");
+    socket.onclose = function () {
+      alert("Connection has been closed.");
+    };
+    socket.onmessage = function (e) {
+      messages.append($("<li>").text(e.data));
+    };
+  }
+});
+
+</script>
 </body>
 </html>
